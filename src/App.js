@@ -1,23 +1,29 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import DragAndDropContainer from './components/DragAndDropContainer';
 
 function App() {
+  let children = [
+      {
+        id:'a',
+        text: "testing..."
+      },
+      {
+        id:'b',
+        text: "twer"
+      },
+      {
+        id:'c',
+        text: "hamnet"
+      }
+    ];
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          See Below Component.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <DragAndDropContainer children={children} />
       </header>
     </div>
   );
