@@ -29,15 +29,31 @@ class DragAndDropContainer extends React.Component {
     }
 
     handleDragEnd (eve,id) {
-        //console.log('dragend',id);
         this.setState({
             dragging: null
         });
     }
 
-    handleDrop (eve,id) {
+    handleDrop (eve,endid) {
+        const children = this.props.children;
         eve.preventDefault();
-        console.log('drop',id);
+        const initialID = eve.dataTransfer.getData('application/listId');
+        console.log('drop',endid,initialID);
+        // IF WE WANT TO RETURN EXACT ARRAY, DON'T BOTHER WITH MAP.
+        const indInitial = children.findIndex(e => e.id === initialID);
+        const indEnd = children.findIndex(e => e.id === endid);
+        let newOrder;
+        if (indInitial === indEnd) {
+            return;
+        }
+        else if (indInitial < indEnd) {
+            newOrder = [].concat(children.slice(0,indInitial), children.slice(indInitial+1,indEnd+1),[children[indInitial]],children.slice(indEnd+1));
+        }
+        else {
+            newOrder = [].concat(children.slice(0,indEnd), children.slice(indEnd+1,indInitial+1),[children[indEnd]],children.slice(indInitial+1));
+        }
+        this.props.reorder(newOrder);
+        //const order = this.props.children.map(e => e.id);
     }
 
     render() {
