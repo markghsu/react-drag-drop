@@ -12,7 +12,7 @@ function DragItem(props) {
             event.preventDefault();
         }}
         >
-            <div className="item" >{props.text}</div>
+            <div className={`item ${props.active?'active':''}`} >{props.text}</div>
         </li>
     )
 }
