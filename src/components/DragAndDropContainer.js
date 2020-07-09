@@ -48,21 +48,14 @@ class DragAndDropContainer extends React.Component {
     }
 
     handleDragEnter (eve,id) {
-        console.log('dragenter',id);
-    }
-
-    handleDragEnd (eve,id) {
-        this.setState({
-            dragging: null
-        });
-    }
-
-    handleDrop (eve,endid) {
         eve.preventDefault();
-        const initialID = eve.dataTransfer.getData('application/listId');
+        // dragEnter event doesn't have permission to view dataTransfer.
+        // Use state instead.
+        // const initialID = eve.dataTransfer.getData('application/listId');
         this.setState((prev) => {
-            const indInitial = prev.list.findIndex(e => e.id === initialID);
-            const indEnd = prev.list.findIndex(e => e.id === endid);
+            if(prev.dragging === null) return {};
+            const indInitial = prev.list.findIndex(e => e.id === prev.dragging);
+            const indEnd = prev.list.findIndex(e => e.id === id);
             if (indInitial === indEnd) {
                 return {};
             }
@@ -77,6 +70,35 @@ class DragAndDropContainer extends React.Component {
                 }
             }
         }); 
+    }
+
+    handleDragEnd (eve,id) {
+        this.setState({
+            dragging: null
+        });
+    }
+
+    handleDrop (eve,endid) {
+        //DO WE NEED THIS IF WE HANDLE EVERYTHING IN DRAGENTER?
+        eve.preventDefault();
+        // const initialID = eve.dataTransfer.getData('application/listId');
+        // this.setState((prev) => {
+        //     const indInitial = prev.list.findIndex(e => e.id === initialID);
+        //     const indEnd = prev.list.findIndex(e => e.id === endid);
+        //     if (indInitial === indEnd) {
+        //         return {};
+        //     }
+        //     else if (indInitial < indEnd) {
+        //         return {
+        //             list: [].concat(prev.list.slice(0,indInitial), prev.list.slice(indInitial+1,indEnd+1),[prev.list[indInitial]],prev.list.slice(indEnd+1))
+        //         } 
+        //     }
+        //     else {
+        //         return {
+        //             list: [].concat(prev.list.slice(0,indEnd), prev.list.slice(indEnd+1,indInitial+1),[prev.list[indEnd]],prev.list.slice(indInitial+1))
+        //         }
+        //     }
+        // }); 
     }
 
     render() {
