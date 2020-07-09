@@ -7,13 +7,13 @@
 
 .drag-list>li {
     margin: 0.3em;
-}
-.drag-list>li>.item {
     width: 6em;
     padding: 0.5em 1em;
     background: #8CD;
     border: 1px solid black;
+    transition: 0.1s background;
 }
-.drag-list>li>.item.active {
+
+.drag-list>li.active {
     background: #8FB;
 }

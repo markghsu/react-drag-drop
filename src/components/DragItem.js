@@ -4,15 +4,16 @@ function DragItem(props) {
     return (
         <li 
         draggable = "true" 
-        onDragStart = {props.dragStart}
+        onDragStart = {(e) => {props.dragStart(e)}}
         onDragEnd = {props.dragEnd}
         onDragEnter = {props.dragEnter}
         onDrop = {props.drop}
         onDragOver = {(event) => {
             event.preventDefault();
         }}
+        className={`${props.active?'active':''}`}
         >
-            <div className={`item ${props.active?'active':''}`} >{props.text}</div>
+            {props.text}
         </li>
     )
 }

@@ -2,11 +2,35 @@ import React from 'react';
 import DragItem from './DragItem';
 import './drag.css';
 
+const myList = [
+    {
+      id:'a',
+      text: "testing..."
+    },
+    {
+      id:'b',
+      text: "twer"
+    },
+    {
+      id:'c',
+      text: "hamnet"
+    },
+    {
+      id:'d',
+      text: "hellowpsdaf"
+    },
+    {
+      id:'e',
+      text: "smaug"
+    }
+  ];
 class DragAndDropContainer extends React.Component {
+    // myList should be replaced by a state manager -- redux, context, flux, etc.
     constructor() {
         super();
         this.state = {
-            dragging: null
+            dragging: null,
+            list: myList
         };
         this.handleDragStart = this.handleDragStart.bind(this);
         this.handleDragEnter = this.handleDragEnter.bind(this);
@@ -18,7 +42,6 @@ class DragAndDropContainer extends React.Component {
         this.setState({
             dragging: id
         });
-        console.log('dragstart',id);
         eve.dataTransfer.dropEffect = 'move';
         eve.dataTransfer.setData('application/listId',id);
         eve.dataTransfer.setData('text/plain',id);
@@ -35,33 +58,32 @@ class DragAndDropContainer extends React.Component {
     }
 
     handleDrop (eve,endid) {
-        const children = this.props.children;
         eve.preventDefault();
         const initialID = eve.dataTransfer.getData('application/listId');
-        console.log('drop',endid,initialID);
-        // IF WE WANT TO RETURN EXACT ARRAY, DON'T BOTHER WITH MAP.
-        const indInitial = children.findIndex(e => e.id === initialID);
-        const indEnd = children.findIndex(e => e.id === endid);
-        let newOrder;
-        if (indInitial === indEnd) {
-            return;
-        }
-        else if (indInitial < indEnd) {
-            newOrder = [].concat(children.slice(0,indInitial), children.slice(indInitial+1,indEnd+1),[children[indInitial]],children.slice(indEnd+1));
-        }
-        else {
-            newOrder = [].concat(children.slice(0,indEnd), children.slice(indEnd+1,indInitial+1),[children[indEnd]],children.slice(indInitial+1));
-        }
-        this.props.reorder(newOrder);
-        //const order = this.props.children.map(e => e.id);
+        this.setState((prev) => {
+            const indInitial = prev.list.findIndex(e => e.id === initialID);
+            const indEnd = prev.list.findIndex(e => e.id === endid);
+            if (indInitial === indEnd) {
+                return {};
+            }
+            else if (indInitial < indEnd) {
+                return {
+                    list: [].concat(prev.list.slice(0,indInitial), prev.list.slice(indInitial+1,indEnd+1),[prev.list[indInitial]],prev.list.slice(indEnd+1))
+                } 
+            }
+            else {
+                return {
+                    list: [].concat(prev.list.slice(0,indEnd), prev.list.slice(indEnd+1,indInitial+1),[prev.list[indEnd]],prev.list.slice(indInitial+1))
+                }
+            }
+        }); 
     }
 
     render() {
-        const {children} = this.props;
-        const {dragging} = this.state;
+        const {list, dragging} = this.state;
         return (
             <ul className = "drag-list">
-                {children.map((e) => (
+                {list.map((e) => (
                 <DragItem 
                     key = {e.id}
                     {...e}
