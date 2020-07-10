@@ -1,4 +1,5 @@
 import React from 'react';
+import { CSSTransition } from 'react-transition-group';
 import DragItem from './DragItem';
 import './drag.css';
 
@@ -56,17 +57,19 @@ class DragAndDropContainer extends React.Component {
             if(prev.dragging === null) return {};
             const indInitial = prev.list.findIndex(e => e.id === prev.dragging);
             const indEnd = prev.list.findIndex(e => e.id === id);
+            const first = Math.min(indInitial,indEnd);
+            const last = Math.max(indInitial,indEnd);
             if (indInitial === indEnd) {
                 return {};
             }
-            else if (indInitial < indEnd) {
-                return {
-                    list: [].concat(prev.list.slice(0,indInitial), prev.list.slice(indInitial+1,indEnd+1),[prev.list[indInitial]],prev.list.slice(indEnd+1))
-                } 
-            }
             else {
+                let newList = [].concat(
+                    prev.list.slice(0,first),
+                    prev.list.slice(first+1,last+1).map((e) => ({...e, transition: true})),
+                    [{...prev.list[first], transition: true}],
+                    prev.list.slice(last+1));
                 return {
-                    list: [].concat(prev.list.slice(0,indEnd), prev.list.slice(indEnd+1,indInitial+1),[prev.list[indEnd]],prev.list.slice(indInitial+1))
+                    list: newList
                 }
             }
         }); 
@@ -101,11 +104,20 @@ class DragAndDropContainer extends React.Component {
         // }); 
     }
 
+    removeTransition(id) {
+        this.setState((prev) => {
+            const list = prev.list;
+            list[list.findIndex(e => e.id === id)].transition = false;
+            return {
+                list
+            }
+        })
+    }
+
     render() {
         const {list, dragging} = this.state;
-        return (
-            <ul className = "drag-list">
-                {list.map((e) => (
+        const listItems = list.map((e) => (
+            <CSSTransition in={e.transition} onEntered={() => this.removeTransition(e.id)} key={e.id} timeout={200} classNames="example">
                 <DragItem 
                     key = {e.id}
                     {...e}
@@ -114,8 +126,12 @@ class DragAndDropContainer extends React.Component {
                     dragEnd = {(eve) => this.handleDragEnd(eve,e.id)}
                     drop = {(eve) => this.handleDrop(eve,e.id)}
                     active = {dragging === e.id}
-                    />
-                ))}
+                />
+            </CSSTransition>
+            ));
+        return (
+            <ul className = "drag-list">
+                    {listItems}
             </ul>
         );
     }
