@@ -1,5 +1,7 @@
 import React from 'react';
-import DragAndDropContainer from './components/DragAndDropContainer';
+import styled from 'styled-components';
+import Draggable from './components/Draggable';
+import DragDropContainerWithHooks from './components/DragDropContainerWithHooks';
 
 function App () {
   return (
@@ -8,10 +10,18 @@ function App () {
         <p>
           See Below Component.
         </p>
-        <DragAndDropContainer />
+        <DragDropContainerWithHooks>
+          <Rect />
+        </DragDropContainerWithHooks>
       </header>
     </div>
   );
 }
 
 export default App;
+
+const Rect = styled.div`
+  width: 200px;
+  height: 200px;
+  background: #33FFCC;
+`
