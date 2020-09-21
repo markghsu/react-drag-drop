@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 const POSITION = {x: 0, y: 0} // CURSOR POSITION DEFAULT
 
-function Draggable({children}) {
+function Draggable({children, onDrag, onDragEnd, id}) {
 	const [dragState, setDragState] = React.useState({
 		isDragging: false,
 		origin: POSITION, // cursor position at time of mousedown
@@ -33,7 +33,8 @@ function Draggable({children}) {
 					// CAN'T USE THE FOLLOWING?
 					//translation: {x: clientX - state.origin.x, y: clientY - state.origin.y}
 				}));
-	},[dragState.origin]);
+		onDrag({translation, id})
+	},[dragState.origin, onDrag, id]);
 
 	const handleMouseUp = React.useCallback(() => {
 		//RESET TO ORIGINAL NON-DRAGGING STATE
@@ -42,7 +43,8 @@ function Draggable({children}) {
 					isDragging: false,
 					// DON'T RESET TRANSLATION/ORIGIN HERE -- WE HAVE TO DO IT OUTSIDE OF THIS CALLBACK
 				}));
-	},[]);
+		onDragEnd();
+	},[onDragEnd]);
 
 	React.useEffect(() => {
 		// ADD EVENT LISTENERS TO WINDOW WHENEVER WE CHANGE OUR DRAG STATE
@@ -68,9 +70,9 @@ function Draggable({children}) {
 	const styles = React.useMemo(() => ({
 		cursor: dragState.isDragging ? 'grabbing' : 'grab',
 		transform: `translate(${dragState.translation['x']}px,${dragState.translation['y']}px)`, // MAKE OUR COMPONENT FOLLOW MOUSE
-		transition: dragState.isDragging ? 'none' : 'transform 300ms', // TRANSITION WHEN RELEASING DRAGGABLE
+		transition: dragState.isDragging ? 'none' : 'transform 500ms', // TRANSITION WHEN RELEASING DRAGGABLE
 		zIndex: dragState.isDragging ? 2 : 1, // MAKE DRAGGED ELEMENT SHOW UP ABOVE ALL OTHERS
-		position: dragState.isDragging ? 'relative' : 'relative' // TO MAKE THE MATH WORK
+		position: dragState.isDragging ? 'absolute' : 'relative' // TO MAKE THE MATH WORK
 	}),[dragState.isDragging,dragState.translation]);
 	return (
 		<div style={styles} onMouseDown={handleMouseDown}>
