@@ -11,7 +11,9 @@ function App () {
           See Below Component.
         </p>
         <DragDropContainerWithHooks>
-          <Rect />
+          <Draggable>
+            <Rect />
+          </Draggable>
         </DragDropContainerWithHooks>
       </header>
     </div>
