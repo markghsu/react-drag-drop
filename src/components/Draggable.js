@@ -24,23 +24,45 @@ function Draggable({children}) {
 	},[]);
 
 	const handleMouseMove = React.useCallback(({clientX, clientY}) => {
-		if(!dragState.isDragging) return;
+		// if(!dragState.isDragging) return; // DON'T NEED THIS BECAUSE WE ONLY ATTACH THIS HANDLER WHEN DRAGGING IS TRUE
 		// CALL OUR SET STATE HOOK, SETTING OUR NEW POSITIONS
+		const translation = {x: clientX - dragState.origin.x, y: clientY - dragState.origin.y};
 		setDragState(state => ({
 					...state,
-					translation: {x: clientX - state.origin.x, y: clientY - state.origin.y}
+					translation
+					// CAN'T USE THE FOLLOWING?
+					//translation: {x: clientX - state.origin.x, y: clientY - state.origin.y}
 				}));
-	},[dragState.isDragging]);
+	},[dragState.origin]);
 
 	const handleMouseUp = React.useCallback(() => {
 		//RESET TO ORIGINAL NON-DRAGGING STATE
 		setDragState(state => ({
 					...state,
 					isDragging: false,
-					origin: POSITION,
-					translation: POSITION
+					// DON'T RESET TRANSLATION/ORIGIN HERE -- WE HAVE TO DO IT OUTSIDE OF THIS CALLBACK
 				}));
 	},[]);
+
+	React.useEffect(() => {
+		// ADD EVENT LISTENERS TO WINDOW WHENEVER WE CHANGE OUR DRAG STATE
+		// (THIS MAKES SURE WE NEVER MISS OUR MOUSEMOVE/MOUSEUP)
+		if (dragState.isDragging) {
+			window.addEventListener('mouseup', handleMouseUp);
+			window.addEventListener('mousemove', handleMouseMove);
+			console.log("added.");
+		} else {
+			window.removeEventListener('mouseup', handleMouseUp);
+			window.removeEventListener('mousemove', handleMouseMove);
+			// CAN'T DO THIS INSIDE OF THE MOUSEUP. ??
+			setDragState(state => ({
+				...state,
+				origin: POSITION,
+				translation: POSITION
+			}))
+			console.log("removed...");
+		}
+	},[dragState.isDragging, handleMouseMove, handleMouseUp]); // WHY DO WE NEED TO INCLUDE THESE IN OUR DEPENDENCY ARRAY?
 
 	// USE MEMO HOOK TO ADD STYLES WHILE OUR STATE IS DRAGGING
 	const styles = React.useMemo(() => ({
@@ -51,7 +73,7 @@ function Draggable({children}) {
 		position: dragState.isDragging ? 'relative' : 'relative' // TO MAKE THE MATH WORK
 	}),[dragState.isDragging,dragState.translation]);
 	return (
-		<div style={styles} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
+		<div style={styles} onMouseDown={handleMouseDown}>
 			{children}
 		</div>
 	);
